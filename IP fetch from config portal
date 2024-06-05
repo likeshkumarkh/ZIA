@@ -1,0 +1,35 @@
+import json
+import ipaddress
+
+# Load subnet data from JSON file
+json_file_path = "zscalerips.json"  # Replace with your JSON file path
+with open(json_file_path) as file:
+    subnet_data = json.load(file)
+
+# Get user input for the IP address
+ip = input("Enter an IP address: ")
+
+# Check if the IP falls within any subnet in the JSON file
+input_ip = ipaddress.ip_address(ip)
+subnet_found = False
+
+for domain, domain_info in subnet_data.items():
+    for continent, continent_info in domain_info.items():
+        for city, city_info in continent_info.items():
+            for entry in city_info:
+                subnet = ipaddress.ip_network(entry["range"])
+                if input_ip in subnet:
+                    subnet_found = True
+                    print(f"The IP address {ip} falls within the subnet {entry['range']}")
+                    print(f"City: {city.split(':')[1].strip()}")
+                    print(f"Continent: {continent.split(':')[1].strip()}")
+                    print(f"Domain: {domain}")
+                    print(f"VPN: {entry['vpn']}")
+                    print(f"GRE: {entry['gre']}")
+                    print(f"Hostname: {entry['hostname']}")
+                    print(f"Latitude: {entry['latitude']}")
+                    print(f"Longitude: {entry['longitude']}")
+                    break
+
+if not subnet_found:
+    print(f"The IP address {ip} does not fall within any subnet in the JSON file.")
